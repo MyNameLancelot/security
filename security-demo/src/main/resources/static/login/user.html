@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>登录界面</title>
+
+    <!-- 新 Bootstrap4 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.1.0/css/bootstrap.min.css">
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- popper.min.js 用于弹窗、提示、下拉菜单 -->
+    <script src="https://cdn.bootcss.com/popper.js/1.12.5/umd/popper.min.js"></script>
+
+    <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+    <script>
+        function register() {
+            //跳转到注册界面register.html进行注册
+            window.open("/register.html", "_blank");  //_self,_parent,_top,_blank
+        }
+        function login() {
+            //登录逻辑
+            //jQuery写法
+            var username = $('#username').val();
+            var password = $('#password').val();
+            var imageCode = $('#imageCode').val();
+            var rememberMe = $('#rememberMe').val();
+            //JavaScript原生写法
+            $.ajax({
+                type: "post",  //post put get 等等
+                url: "/authentication/commit",
+                //编写登录功能时，要将异步设置为false（缺省为true）
+                //如果async是ture,对于FireFox浏览器，会刷新掉alert()弹出框的内容
+                //对于Chrome浏览器，第一次注册时会执行error的回调函数，输出“请求在连接过程中出现错误..”
+                async: false,
+                data: {  //要传入ashx文件的数据
+                    "username": username,
+                    "password": password,
+                    "imageCode": imageCode,
+                    "rememberMe": rememberMe
+                }
+                ,
+                success: function (data, textStatus) {
+                    if (data.code == "200") {
+                        window.open("/me");
+                    } else {
+                        alert(data.content);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {  //连接至ashx文件失败时，执行函数
+                    //XMLHttpRequest在这个例子里没有用到
+                    //textStatus是表示状态的字符串，这里textStatus的值是"error"
+                    //errorThrown包含连接失败的信息，可以输出查看
+                    console.debug(textStatus);
+                    console.debug(XMLHttpRequest);
+                    console.debug(errorThrown);
+                    alert("请求在连接过程中出现错误..\n" + errorThrown);
+                }
+            });
+        }
+
+        function sendSms() {
+            //登录逻辑
+            //jQuery写法
+            var mobile = $('#mobile').val();
+            //JavaScript原生写法
+            $.ajax({
+                type: "get",  //post put get 等等
+                url: "/verify/sms/code/" + mobile,
+                async: false,
+                success: function (data, textStatus) {
+                    console.debug(data);
+                    if (data.code == "200") {
+                        alert(data.content);
+                    } else {
+                        alert(data.content);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.debug(textStatus);
+                    console.debug(XMLHttpRequest);
+                    console.debug(errorThrown);
+                    alert("请求在连接过程中出现错误..\n" + errorThrown);
+                }
+            });
+        }
+
+        function smsLogin() {
+            //登录逻辑
+            //jQuery写法
+            var mobile = $('#mobile').val();
+            var code = $('#smsCode').val();
+            //JavaScript原生写法
+            $.ajax({
+                type: "post",  //post put get 等等
+                url: "/authentication/sms/commit",
+                //编写登录功能时，要将异步设置为false（缺省为true）
+                //如果async是ture,对于FireFox浏览器，会刷新掉alert()弹出框的内容
+                //对于Chrome浏览器，第一次注册时会执行error的回调函数，输出“请求在连接过程中出现错误..”
+                async: false,
+                data: {  //要传入ashx文件的数据
+                    "mobile": mobile,
+                    "code": code
+                    // ,
+                    // "rememberMe": rememberMe
+                }
+                ,
+                success: function (data, textStatus) {
+                    if (data.code == "200") {
+                        window.open("/quick");
+                    } else {
+                        alert(data.content);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {  //连接至ashx文件失败时，执行函数
+                    //XMLHttpRequest在这个例子里没有用到
+                    //textStatus是表示状态的字符串，这里textStatus的值是"error"
+                    //errorThrown包含连接失败的信息，可以输出查看
+                    console.debug(textStatus);
+                    console.debug(XMLHttpRequest);
+                    console.debug(errorThrown);
+                    alert("请求在连接过程中出现错误..\n" + errorThrown);
+                }
+            });
+        }
+
+    </script>
+</head>
+<body>
+<!-- 登录表单 -->
+<form style="margin-left:500px;margin-top:200px;" >
+    <div class="form-group">
+        <label for="username" stype="display:inline;">账户：</label>
+        <input type="text" class="form-control" id="username" value="张三" style="display:inline;width:200px;" autocomplete="off" />
+    </div>
+    <div class="form-group">
+        <label for="password" style="display:inline;">密码：</label>
+        <input type="text" class="form-control" id="password" value="123" style="display:inline;width:200px;" autocomplete="off" />
+    </div>
+    <div class="form-group">
+        <label for="imageCode" style="display:inline;">验证码：</label>
+        <img  src="/verify/image/code" />
+        <input type="text" class="form-control" id="imageCode" value="" style="display:inline;width:200px;" autocomplete="off" />
+    </div>
+    <div class="form-group">
+        <input type="checkbox"  id="rememberMe" value="true" >记住我</input>
+    </div>
+    <div class="form-group">
+        <label for="mobile" style="display:inline;">手机号：</label>
+        <input type="text" class="form-control" id="mobile" value="15712904378" style="display:inline;width:200px;" autocomplete="off" />
+        <button type="submit" class="btn btn-primary" onclick="sendSms()">发送短信</button>
+    </div>
+    <div class="form-group">
+        <label for="smsCode" style="display:inline;">验证码：</label>
+        <input type="text" class="form-control" id="smsCode" value="" style="display:inline;width:200px;" autocomplete="off" />
+    </div>
+    <button type="submit" class="btn btn-primary" onclick="login()">登录</button>
+    <button type="submit" class="btn btn-primary" onclick="smsLogin()">短信登陆</button>
+    <button type="submit" class="btn btn-primary" onclick="register()">注册</button>
+    <a href="/connect/callback/qq" >QQ登陆</a>
+    <a href="/connect/weixin" >WeChat登陆</a>
+</form>
+</body>
+</html>
